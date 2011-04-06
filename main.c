@@ -35,6 +35,7 @@ typedef unsigned __int8   uint8;
 
 unsigned long ddc_base = GPIOB;
 
+//http://lwn.net/Articles/102232/
 //http://www.fiveanddime.net/kernel/linux-2.6.11.2/arch/alpha/kernel/io.c.html
 //unsigned long mmio_start_phys;
 //par->mmio_start_phys = pci_resource_start(par->dev, 1);
