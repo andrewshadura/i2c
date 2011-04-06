@@ -34,54 +34,40 @@ typedef unsigned __int8   uint8;
 #define SDA_VAL_IN		0x1000
 
 unsigned long ddc_base = GPIOB;
-unsigned long mmio_start_phys;
 
+//http://www.fiveanddime.net/kernel/linux-2.6.11.2/arch/alpha/kernel/io.c.html
+//unsigned long mmio_start_phys;
 //par->mmio_start_phys = pci_resource_start(par->dev, 1);
 //par->mmio_start_virtual = ioremap_nocache(par->mmio_start_phys, MMIO_SIZE);
+//uint8  __iomem *mmio = par->mmio_start_virtual;
 
-static void i810i2c_setscl(void *data, int state)
+static void i810i2c_setscl(int state)
 {
-	struct i810fb_i2c_chan    *chan = data;
-	struct i810fb_par         *par = chan->par;
-	uint8                        __iomem *mmio = par->mmio_start_virtual;
-
 	if (state)
 		i810_writel(mmio, ddc_base, SCL_DIR_MASK | SCL_VAL_MASK);
 	else
 		i810_writel(mmio, ddc_base, SCL_DIR | SCL_DIR_MASK | SCL_VAL_MASK);
-	i810_readl(mmio, chan->ddc_base);	/* flush posted write */
+	i810_readl(mmio, ddc_base);	/* flush posted write */
 }
 
-static void i810i2c_setsda(void *data, int state)
+static void i810i2c_setsda(int state)
 {
-	struct i810fb_i2c_chan    *chan = data;
-	struct i810fb_par         *par = chan->par;
-	uint8                        __iomem *mmio = par->mmio_start_virtual;
-
 	if (state)
 		i810_writel(mmio, ddc_base, SDA_DIR_MASK | SDA_VAL_MASK);
 	else
 		i810_writel(mmio, ddc_base, SDA_DIR | SDA_DIR_MASK | SDA_VAL_MASK);
-	i810_readl(mmio, chan->ddc_base);	/* flush posted write */
+	i810_readl(mmio, ddc_base);	/* flush posted write */
 }
 
-static int i810i2c_getscl(void *data)
+static int i810i2c_getscl()
 {
-	struct i810fb_i2c_chan    *chan = data;
-	struct i810fb_par         *par = chan->par;
-	uint8                        __iomem *mmio = par->mmio_start_virtual;
-
 	i810_writel(mmio, ddc_base, SCL_DIR_MASK);
 	i810_writel(mmio, dcd_base, 0);
 	return ((i810_readl(mmio, ddc_base) & SCL_VAL_IN) != 0);
 }
 
-static int i810i2c_getsda(void *data)
+static int i810i2c_getsda()
 {
-	struct i810fb_i2c_chan    *chan = data;
-	struct i810fb_par         *par = chan->par;
-	uint8                        __iomem *mmio = par->mmio_start_virtual;
-
 	i810_writel(mmio, ddc_base, SDA_DIR_MASK);
 	i810_writel(mmio, ddc_base, 0);
 	return ((i810_readl(mmio, ddc_base) & SDA_VAL_IN) != 0);
