@@ -34,7 +34,7 @@ UCHAR *mmio;
 #define OUTREG(reg, state) (*((PUINT32)(reg)) = state)
 #define INREG(reg) (*((PUINT32)(reg)))
 
-static void WRITE_SCL(int state)
+VOID WRITE_SCL(int state)
 {
 	UINT32 val;
 
@@ -43,7 +43,7 @@ static void WRITE_SCL(int state)
 	val = INREG(mmio + ddc_base);
 }
 
-static void WRITE_SDA(int state)
+VOID WRITE_SDA(int state)
 {
 	UINT32 val;
 
@@ -52,7 +52,7 @@ static void WRITE_SDA(int state)
 	val = INREG(mmio + ddc_base);
 }
 
-static UINT32 READ_SCL()
+UINT32 READ_SCL()
 {
 	UINT32 val;
 
@@ -62,7 +62,7 @@ static UINT32 READ_SCL()
 	return ((val & SCL_VAL_IN) != 0);
 }
 
-static UINT32 READ_SDA()
+UINT32 READ_SDA()
 {
 	UINT32 val;
 
@@ -72,12 +72,14 @@ static UINT32 READ_SDA()
 	return ((val & SDA_VAL_IN) != 0);
 }
 
+#define DDC_EEPROM_ADDRESS  0xA0
+
 #define LOW               0
 #define HIGH              1
 #define WRITE             0
 #define READ              1
 
-#define DELAY_HALF()      Sleep(20);
+#define DELAY()      Sleep(7);
 
 BOOL I2CWrite(UCHAR Data)
 {
@@ -89,23 +91,23 @@ BOOL I2CWrite(UCHAR Data)
 	{
 		WRITE_SCL(LOW);
 		WRITE_SDA((Data & Bit) ? HIGH : LOW);
-		DELAY_HALF();
+		DELAY();
 		WRITE_SCL(HIGH);
-		DELAY_HALF();
+		DELAY();
 	}
 
 	/* get ack */
 	WRITE_SCL(LOW);
 	WRITE_SDA(HIGH);
-	DELAY_HALF();
+	DELAY();
 	WRITE_SCL(HIGH);
 	do
 	{
-		DELAY_HALF();
+		DELAY();
 	}
 	while (READ_SCL() != HIGH);
 	Ack = (READ_SDA() == LOW);
-	DELAY_HALF();
+	DELAY();
 
 	printf("I2CWrite: %s\n", Ack ? "Ack" : "Nak");
 	return Ack;
@@ -124,9 +126,9 @@ UCHAR I2CRead(BOOL Ack)
 	for (Bit = (1 << 7); Bit != 0; Bit >>= 1)
 	{
 		WRITE_SCL(LOW);
-		DELAY_HALF();
+		DELAY();
 		WRITE_SCL(HIGH);
-		DELAY_HALF();
+		DELAY();
 		if (READ_SDA() == HIGH)
 			Data |= Bit;
 	}
@@ -134,11 +136,11 @@ UCHAR I2CRead(BOOL Ack)
 	/* send ack/nak */
 	WRITE_SCL(LOW);
 	WRITE_SDA(Ack ? LOW : HIGH);
-	DELAY_HALF();
+	DELAY();
 	WRITE_SCL(HIGH);
 	do
 	{
-		DELAY_HALF();
+		DELAY();
 	}
 	while (READ_SCL() != HIGH);
 
@@ -149,9 +151,9 @@ VOID I2CStop()
 {
 	WRITE_SCL(LOW);
 	WRITE_SDA(LOW);
-	DELAY_HALF();
+	DELAY();
 	WRITE_SCL(HIGH);
-	DELAY_HALF();
+	DELAY();
 	WRITE_SDA(HIGH);
 }
 
@@ -166,7 +168,7 @@ BOOL I2CStart(UCHAR Address)
 
 	/* send address */
 	WRITE_SDA(LOW);
-	DELAY_HALF();
+	DELAY();
 	if (!I2CWrite(Address))
 	{
 		/* ??release the bus?? */
@@ -183,17 +185,56 @@ BOOL I2CRepStart(UCHAR Address)
 {
 	/* setup lines for repeated start condition */
 	WRITE_SCL(LOW);
-	DELAY_HALF();
+	DELAY();
 	WRITE_SDA(HIGH);
-	DELAY_HALF();
+	DELAY();
 	WRITE_SCL(HIGH);
-	DELAY_HALF();
+	DELAY();
 
 	return I2CStart(Address);
 }
 
-BOOLEAN GetEdid(PUCHAR pEdidBuffer, ULONG EdidBufferSize);
+BOOLEAN GetEdid(PUCHAR pEdidBuffer, ULONG EdidBufferSize)
+{
+	INT Count, i;
+	PUCHAR pBuffer = (PUCHAR)pEdidBuffer;
+	BOOL Ack;
 
+	printf("GetEdid()\n");
+
+	/* select eeprom */
+	if (!I2CStart(DDC_EEPROM_ADDRESS | WRITE))
+		return FALSE;
+	/* set address */
+	if (!I2CWrite(0x00))
+		return FALSE;
+	/* change into read mode */
+	if (!I2CRepStart(DDC_EEPROM_ADDRESS | READ))
+		return FALSE;
+	/* read eeprom */
+	RtlZeroMemory(pEdidBuffer, EdidBufferSize);
+	Count = min(128, EdidBufferSize);
+	for (i = 0; i < Count; i++)
+	{
+		Ack = ((i + 1) < Count);
+		pBuffer[i] = I2CRead(Ack);
+	}
+	I2CStop();
+
+	/* check EDID header */
+	if (pBuffer[0] != 0x00 || pBuffer[1] != 0xff ||
+		pBuffer[2] != 0xff || pBuffer[3] != 0xff ||
+		pBuffer[4] != 0xff || pBuffer[5] != 0xff ||
+		pBuffer[6] != 0xff || pBuffer[7] != 0x00)
+	{
+		printf("GetEdid(): Invalid EDID header!\n");
+		return FALSE;
+	}
+
+	printf("GetEdid(): EDID version %d rev. %d\n", pBuffer[18], pBuffer[19]);
+	printf("GetEdid() - SUCCESS!\n");
+	return TRUE;
+}
 
 VOID Test(char c)
 {
@@ -201,39 +242,38 @@ VOID Test(char c)
 
 	WRITE_SDA(HIGH);
 	WRITE_SCL(HIGH);
-	DELAY_HALF();
+	DELAY();
 
 	printf("scl %c = 0x%08x\n", c, READ_SCL());
 	printf("sda %c = 0x%08x\n", c, READ_SDA());
-	DELAY_HALF();
+	DELAY();
 
 	WRITE_SDA(LOW);
 	WRITE_SCL(LOW);
-	DELAY_HALF();
+	DELAY();
 
 	printf("scl %c = 0x%08x\n", c, READ_SCL());
 	printf("sda %c = 0x%08x\n", c, READ_SDA());
-	DELAY_HALF();
+	DELAY();
 
 	WRITE_SDA(HIGH);
 	WRITE_SCL(HIGH);
-	DELAY_HALF();
+	DELAY();
 
 	printf("scl %c = 0x%08x\n", c, READ_SCL());
 	printf("sda %c = 0x%08x\n", c, READ_SDA());
-	DELAY_HALF();
+	DELAY();
 
 	WRITE_SDA(LOW);
 	WRITE_SCL(LOW);
-	DELAY_HALF();
+	DELAY();
 
 	printf("scl %c = 0x%08x\n", c, READ_SCL());
 	printf("sda %c = 0x%08x\n", c, READ_SDA());
-	DELAY_HALF();
+	DELAY();
 }
 
 /* XP SP2, Intel 82865G Graphics Controller */
-#define DDC_EEPROM_ADDRESS  0xA0
 #define MMIO_START_PHYS		0xFFA80000
 
 int main()
@@ -255,7 +295,7 @@ int main()
 
 	WRITE_SDA(HIGH);
 	WRITE_SCL(HIGH);
-	DELAY_HALF();
+	DELAY();
 
 	PUCHAR edid = (PUCHAR)calloc(128, sizeof(UCHAR));
 	if (GetEdid(edid, 128))
@@ -304,46 +344,4 @@ int main()
 	getchar();
 
 	return 0;
-}
-
-BOOLEAN GetEdid(PUCHAR pEdidBuffer, ULONG EdidBufferSize)
-{
-	INT Count, i;
-	PUCHAR pBuffer = (PUCHAR)pEdidBuffer;
-	BOOL Ack;
-
-	printf("GetEdid()\n");
-
-	/* select eeprom */
-	if (!I2CStart(DDC_EEPROM_ADDRESS | WRITE))
-		return FALSE;
-	/* set address */
-	if (!I2CWrite(0x00))
-		return FALSE;
-	/* change into read mode */
-	if (!I2CRepStart(DDC_EEPROM_ADDRESS | READ))
-		return FALSE;
-	/* read eeprom */
-	RtlZeroMemory(pEdidBuffer, EdidBufferSize);
-	Count = min(128, EdidBufferSize);
-	for (i = 0; i < Count; i++)
-	{
-		Ack = ((i + 1) < Count);
-		pBuffer[i] = I2CRead(Ack);
-	}
-	I2CStop();
-
-	/* check EDID header */
-	if (pBuffer[0] != 0x00 || pBuffer[1] != 0xff ||
-		pBuffer[2] != 0xff || pBuffer[3] != 0xff ||
-		pBuffer[4] != 0xff || pBuffer[5] != 0xff ||
-		pBuffer[6] != 0xff || pBuffer[7] != 0x00)
-	{
-		printf("GetEdid(): Invalid EDID header!\n");
-		return FALSE;
-	}
-
-	printf("GetEdid(): EDID version %d rev. %d\n", pBuffer[18], pBuffer[19]);
-	printf("GetEdid() - SUCCESS!\n");
-	return TRUE;
 }
