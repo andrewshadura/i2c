@@ -72,8 +72,6 @@ static UINT32 READ_SDA()
 	return ((val & SDA_VAL_IN) != 0);
 }
 
-#define DDC_EEPROM_ADDRESS  0x50
-
 #define LOW               0
 #define HIGH              1
 #define WRITE             0
@@ -194,6 +192,120 @@ BOOL I2CRepStart(UCHAR Address)
 	return I2CStart(Address);
 }
 
+BOOLEAN GetEdid(PUCHAR pEdidBuffer, ULONG EdidBufferSize);
+
+
+VOID Test(char c)
+{
+	printf("\n\nTest %c\n", c);
+
+	WRITE_SDA(HIGH);
+	WRITE_SCL(HIGH);
+	DELAY_HALF();
+
+	printf("scl %c = 0x%08x\n", c, READ_SCL());
+	printf("sda %c = 0x%08x\n", c, READ_SDA());
+	DELAY_HALF();
+
+	WRITE_SDA(LOW);
+	WRITE_SCL(LOW);
+	DELAY_HALF();
+
+	printf("scl %c = 0x%08x\n", c, READ_SCL());
+	printf("sda %c = 0x%08x\n", c, READ_SDA());
+	DELAY_HALF();
+
+	WRITE_SDA(HIGH);
+	WRITE_SCL(HIGH);
+	DELAY_HALF();
+
+	printf("scl %c = 0x%08x\n", c, READ_SCL());
+	printf("sda %c = 0x%08x\n", c, READ_SDA());
+	DELAY_HALF();
+
+	WRITE_SDA(LOW);
+	WRITE_SCL(LOW);
+	DELAY_HALF();
+
+	printf("scl %c = 0x%08x\n", c, READ_SCL());
+	printf("sda %c = 0x%08x\n", c, READ_SDA());
+	DELAY_HALF();
+}
+
+/* XP SP2, Intel 82865G Graphics Controller */
+#define DDC_EEPROM_ADDRESS  0xA0
+#define MMIO_START_PHYS		0xFFA80000
+
+int main()
+{
+	CHAR c;
+	BOOL b = LoadPhyMemDriver();
+
+	if (b == FALSE)
+	{
+		printf("load phymem.sys failed\n");
+		return 1;
+	}
+
+	UINT8 *mmio_start_virtual = (UINT8 *)MapPhyMem(MMIO_START_PHYS, MMIO_SIZE);
+	printf("mapped virtual address = 0x%08x\n", mmio_start_virtual);
+
+	mmio = mmio_start_virtual;
+	ddc_base = GPIOA;
+
+	WRITE_SDA(HIGH);
+	WRITE_SCL(HIGH);
+	DELAY_HALF();
+
+	PUCHAR edid = (PUCHAR)calloc(128, sizeof(UCHAR));
+	if (GetEdid(edid, 128))
+	{
+		printf("\nEDID:\n");
+		for (int i = 0; i < 128; i++)
+			printf("0x%02x ", edid[i]);
+	}
+
+	///*ddc_base = GPIOA;
+	//c = 'A';
+	//Test(c);
+
+	//ddc_base = GPIOB;
+	//c = 'B';
+	//Test(c);
+
+	//ddc_base = GPIOC;
+	//c = 'C';
+	//Test(c);
+
+	//ddc_base = GPIOD;
+	//c = 'D';
+	//Test(c);
+
+	//ddc_base = GPIOE;
+	//c = 'E';
+	//Test(c);
+
+	//ddc_base = GPIOF;
+	//c = 'F';
+	//Test(c);
+
+	//ddc_base = GPIOG;
+	//c = 'G';
+	//Test(c);
+
+	//ddc_base = GPIOH;
+	//c = 'H';
+	//Test(c);*/
+
+	UnmapPhyMem(mmio_start_virtual, MMIO_SIZE);
+	UnloadPhyMemDriver();
+
+	printf("\nend");
+	getchar();
+
+	return 0;
+}
+
 BOOLEAN GetEdid(PUCHAR pEdidBuffer, ULONG EdidBufferSize)
 {
 	INT Count, i;
@@ -234,121 +346,4 @@ BOOLEAN GetEdid(PUCHAR pEdidBuffer, ULONG EdidBufferSize)
 	printf("GetEdid(): EDID version %d rev. %d\n", pBuffer[18], pBuffer[19]);
 	printf("GetEdid() - SUCCESS!\n");
 	return TRUE;
-}
-
-VOID Test(char c)
-{
-	printf("\n\nTest %c\n", c);
-
-	WRITE_SDA(HIGH);
-	WRITE_SCL(HIGH);
-	DELAY_HALF();
-
-	printf("scl %c = 0x%08x\n", c, READ_SCL());
-	printf("sda %c = 0x%08x\n", c, READ_SDA());
-	DELAY_HALF();
-
-	WRITE_SDA(LOW);
-	WRITE_SCL(LOW);
-	DELAY_HALF();
-
-	printf("scl %c = 0x%08x\n", c, READ_SCL());
-	printf("sda %c = 0x%08x\n", c, READ_SDA());
-	DELAY_HALF();
-
-	WRITE_SDA(HIGH);
-	WRITE_SCL(HIGH);
-	DELAY_HALF();
-
-	printf("scl %c = 0x%08x\n", c, READ_SCL());
-	printf("sda %c = 0x%08x\n", c, READ_SDA());
-	DELAY_HALF();
-
-	WRITE_SDA(LOW);
-	WRITE_SCL(LOW);
-	DELAY_HALF();
-
-	printf("scl %c = 0x%08x\n", c, READ_SCL());
-	printf("sda %c = 0x%08x\n", c, READ_SDA());
-	DELAY_HALF();
-}
-
-int main()
-{
-	CHAR c;
-	BOOL b = LoadPhyMemDriver();
-
-	if (b == FALSE)
-	{
-		printf("load phymem.sys failed\n");
-		exit(-1);
-	}
-
-	//mmio_start_phys = 0xD0200000;
-	//mmio_start_phys = 0xD0280000;
-	//mmio_start_phys = 0xFFA80000;
-
-	UINT8 *mmio_start_virtual = (UINT8 *)MapPhyMem(mmio_start_phys, MMIO_SIZE);
-	printf("mapped virtual address = 0x%08x\n", mmio_start_virtual);
-
-	mmio = mmio_start_virtual;
-
-	//printf("scl C = 0x%08x\n", READ_SCL());
-	//printf("sda C = 0x%08x\n", READ_SDA());
-
-	//ddc_base = GPIOE;
-
-	//WRITE_SDA(HIGH);
-	//WRITE_SCL(HIGH);
-	//DELAY_HALF();
-	//printf("scl C = 0x%08x\n", READ_SCL());
-	//printf("sda C = 0x%08x\n", READ_SDA());
-
-	//PUCHAR edid = (PUCHAR)calloc(256, sizeof(UCHAR));
-	//if (GetEdid(edid, 256))
-	//{
-	//	printf("OK!!!\n");
-	//}
-	//else
-	//	printf("NOT OK!!!\n");
-
-	ddc_base = GPIOA;
-	c = 'A';
-	Test(c);
-
-	ddc_base = GPIOB;
-	c = 'B';
-	Test(c);
-
-	ddc_base = GPIOC;
-	c = 'C';
-	Test(c);
-
-	ddc_base = GPIOD;
-	c = 'D';
-	Test(c);
-
-	ddc_base = GPIOE;
-	c = 'E';
-	Test(c);
-
-	ddc_base = GPIOF;
-	c = 'F';
-	Test(c);
-
-	ddc_base = GPIOG;
-	c = 'G';
-	Test(c);
-
-	ddc_base = GPIOH;
-	c = 'H';
-	Test(c);
-
-	UnmapPhyMem(mmio_start_virtual, MMIO_SIZE);
-	UnloadPhyMemDriver();
-
-	printf("end");
-	getchar();
-
-	return 0;
 }
