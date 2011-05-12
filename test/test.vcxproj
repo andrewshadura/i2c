@@ -77,6 +77,7 @@
   <ItemGroup>
     <ClCompile Include="i2c_base.cpp" />
     <ClCompile Include="i810_i2c.cpp" />
+    <ClCompile Include="radeon_i2c.cpp" />
     <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>

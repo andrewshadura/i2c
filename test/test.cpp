@@ -1,4 +1,5 @@
 #include "i810_i2c.cpp"
+#include "radeon_i2c.cpp"
 #include "i2c_base.cpp"
 #include "pmdll.h"
 
