@@ -1,5 +1,3 @@
-* add README with some details (and also license information)
-* add COPYING file with LGPL 2.1 text verbatim
 * do some code clean-up (remove redundant comments and dead code)
 * make it a shared library, please
 
