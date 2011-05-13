@@ -1,0 +1,12 @@
+* add README with some details (and also license information)
+* add COPYING file with LGPL 2.1 text verbatim
+* do some code clean-up (remove redundant comments and dead code)
+* make it a shared library, please
+
+Wishlist items:
+* try to build with MinGW (and write a simple Makefile)
+* write code Doxygen-style comments and process with Doxygen to make docs
+* add support for more chips
+* ...
+* PROFIT!
+* total and utter world domination
