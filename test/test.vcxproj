@@ -54,7 +54,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>pmdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>external/pmdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -75,14 +75,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="i2c_base.cpp" />
-    <ClCompile Include="i810_i2c.cpp" />
-    <ClCompile Include="radeon_i2c.cpp" />
-    <ClCompile Include="test.cpp" />
+    <ClInclude Include="external\pmdll.h" />
+    <ClInclude Include="src\i2c.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="i2c.h" />
-    <ClInclude Include="pmdll.h" />
+    <Library Include="external\pmdll.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\i2c_base.cpp" />
+    <ClCompile Include="src\i810_i2c.cpp" />
+    <ClCompile Include="src\radeon_i2c.cpp" />
+    <ClCompile Include="src\test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
