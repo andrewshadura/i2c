@@ -1,5 +1,4 @@
-* do some code clean-up (remove redundant comments and dead code)
-* make it a shared library, please
+All done
 
 Wishlist items:
 * try to build with MinGW (and write a simple Makefile)

@@ -118,7 +118,7 @@ static BOOL I2CRepStart(struct i2c_struct *st, UCHAR Address)
 	return I2CStart(st, Address);
 }
 
-static BOOLEAN GetEdid(struct i2c_struct *st, PUCHAR pEdidBuffer, ULONG EdidBufferSize)
+static BOOLEAN DumpEdid(struct i2c_struct *st, PUCHAR pEdidBuffer, ULONG EdidBufferSize)
 {
 	INT Count, i;
 	PUCHAR pBuffer = (PUCHAR)pEdidBuffer;

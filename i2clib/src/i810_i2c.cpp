@@ -66,43 +66,6 @@ static UINT32 i810_getscl(struct i2c_struct *st)
 	return ((val & SCL_VAL_IN) != 0);
 }
 
-//static VOID test(struct i2c_struct *st, char c)
-//{
-//	printf("\n\nTest %c\n", c);
-//
-//	st->setsda(st, HIGH);
-//	st->setscl(st, HIGH);
-//	Sleep(st->udelay);
-//
-//	printf("scl %c = 0x%08x\n", c, st->getscl(st));
-//	printf("sda %c = 0x%08x\n", c, st->getsda(st));
-//	Sleep(st->udelay);
-//
-//	st->setsda(st, LOW);
-//	st->setscl(st, LOW);
-//	Sleep(st->udelay);
-//
-//	printf("scl %c = 0x%08x\n", c, st->getscl(st));
-//	printf("sda %c = 0x%08x\n", c, st->getsda(st));
-//	Sleep(st->udelay);
-//
-//	st->setsda(st, HIGH);
-//	st->setscl(st, HIGH);
-//	Sleep(st->udelay);
-//
-//	printf("scl %c = 0x%08x\n", c, st->getscl(st));
-//	printf("sda %c = 0x%08x\n", c, st->getsda(st));
-//	Sleep(st->udelay);
-//
-//	st->setsda(st, LOW);
-//	st->setscl(st, LOW);
-//	Sleep(st->udelay);
-//
-//	printf("scl %c = 0x%08x\n", c, st->getscl(st));
-//	printf("sda %c = 0x%08x\n", c, st->getsda(st));
-//	Sleep(st->udelay);
-//}
-
 static VOID i810_init(struct i2c_struct *st)
 {
 	st->ddc_base = GPIOA;
@@ -117,38 +80,4 @@ static VOID i810_init(struct i2c_struct *st)
 	st->setsda(st, 1);
 	st->setscl(st, 1);
 	Sleep(20);
-
-	//CHAR c;
-
-	//st->ddc_base = GPIOA;
-	//c = 'A';
-	//test(c);
-
-	//st->ddc_base = GPIOB;
-	//c = 'B';
-	//test(c);
-
-	//st->ddc_base = GPIOC;
-	//c = 'C';
-	//test(c);
-
-	//st->ddc_base = GPIOD;
-	//c = 'D';
-	//test(c);
-
-	//st->ddc_base = GPIOE;
-	//c = 'E';
-	//test(c);
-
-	//st->ddc_base = GPIOF;
-	//c = 'F';
-	//test(c);
-
-	//st->ddc_base = GPIOG;
-	//c = 'G';
-	//test(c);
-
-	//st->ddc_base = GPIOH;
-	//c = 'H';
-	//test(c);*/
 }
