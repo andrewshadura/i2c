@@ -3,7 +3,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include "..\external\pmdll.h"
+#include "../external/pmdll.h"
 #include "i2c_base.cpp"
 #include "i810_i2c.cpp"
 #include "radeon_i2c.cpp"
