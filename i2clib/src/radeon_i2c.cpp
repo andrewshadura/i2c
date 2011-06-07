@@ -26,7 +26,7 @@
 
 // mmio??
 
-static VOID radeon_setsda(struct i2c_struct *st, UINT32 state)
+static VOID radeon_setsda(struct i2c_driver_t *st, UINT32 state)
 {
 	UCHAR *mmio = st->mmio_start_virtual;
 	UINT32 val;
@@ -39,7 +39,7 @@ static VOID radeon_setsda(struct i2c_struct *st, UINT32 state)
 	(void)INREG(st->ddc_base);
 }
 
-static VOID radeon_setscl(struct i2c_struct *st, UINT32 state)
+static VOID radeon_setscl(struct i2c_driver_t *st, UINT32 state)
 {
 	UCHAR *mmio = st->mmio_start_virtual;
 	UINT32 val;
@@ -52,7 +52,7 @@ static VOID radeon_setscl(struct i2c_struct *st, UINT32 state)
 	(void)INREG(st->ddc_base);
 }
 
-static UINT32 radeon_getsda(struct i2c_struct *st)
+static UINT32 radeon_getsda(struct i2c_driver_t *st)
 {
 	UCHAR *mmio = st->mmio_start_virtual;
 	UINT32 val;
@@ -62,7 +62,7 @@ static UINT32 radeon_getsda(struct i2c_struct *st)
 	return (val & VGA_DDC_DATA_INPUT) ? 1 : 0;
 }
 
-static UINT32 radeon_getscl(struct i2c_struct *st)
+static UINT32 radeon_getscl(struct i2c_driver_t *st)
 {
 	UCHAR *mmio = st->mmio_start_virtual;
 	UINT32 val;
@@ -72,7 +72,7 @@ static UINT32 radeon_getscl(struct i2c_struct *st)
 	return (val & VGA_DDC_CLK_INPUT) ? 1 : 0;
 }
 
-static VOID radeon_init(struct i2c_struct *st)
+static VOID radeon_init(struct i2c_driver_t *st)
 {
 	st->ddc_base = GPIO_CRT2_DDC;
 

@@ -5,7 +5,7 @@
 #define WRITE             0
 #define READ              1
 
-static BOOL I2CWrite(struct i2c_struct *st, UCHAR Data)
+static BOOL I2CWrite(struct i2c_driver_t *st, UCHAR Data)
 {
 	UCHAR Bit;
 	BOOL Ack;
@@ -37,7 +37,7 @@ static BOOL I2CWrite(struct i2c_struct *st, UCHAR Data)
 	return Ack;
 }
 
-static UCHAR I2CRead(struct i2c_struct *st, BOOL Ack)
+static UCHAR I2CRead(struct i2c_driver_t *st, BOOL Ack)
 {
 	INT Bit = 0x80;
 	UCHAR Data = 0;
@@ -71,7 +71,7 @@ static UCHAR I2CRead(struct i2c_struct *st, BOOL Ack)
 	return Data;
 }
 
-static VOID I2CStop(struct i2c_struct *st)
+static VOID I2CStop(struct i2c_driver_t *st)
 {
 	st->setscl(st, LOW);
 	st->setsda(st, LOW);
@@ -81,7 +81,7 @@ static VOID I2CStop(struct i2c_struct *st)
 	st->setsda(st, HIGH);
 }
 
-static BOOL I2CStart(struct i2c_struct *st, UCHAR Address)
+static BOOL I2CStart(struct i2c_driver_t *st, UCHAR Address)
 {
 	/* make sure the bus is free */
 	if (st->getsda(st) == LOW || st->getscl(st) == LOW)
@@ -105,7 +105,7 @@ static BOOL I2CStart(struct i2c_struct *st, UCHAR Address)
 	return TRUE;
 }
 
-static BOOL I2CRepStart(struct i2c_struct *st, UCHAR Address)
+static BOOL I2CRepStart(struct i2c_driver_t *st, UCHAR Address)
 {
 	/* setup lines for repeated start condition */
 	st->setscl(st, LOW);
@@ -118,7 +118,7 @@ static BOOL I2CRepStart(struct i2c_struct *st, UCHAR Address)
 	return I2CStart(st, Address);
 }
 
-static BOOLEAN DumpEdid(struct i2c_struct *st, PUCHAR pEdidBuffer, ULONG EdidBufferSize)
+static BOOLEAN DumpEdid(struct i2c_driver_t *st, PUCHAR pEdidBuffer, ULONG EdidBufferSize)
 {
 	INT Count, i;
 	PUCHAR pBuffer = (PUCHAR)pEdidBuffer;

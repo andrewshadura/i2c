@@ -24,7 +24,7 @@
 #define OUTREG(reg, state) (*((PUINT32)(reg)) = state)
 #define INREG(reg) (*((PUINT32)(reg)))
 
-static VOID i810_setsda(struct i2c_struct *st, UINT32 state)
+static VOID i810_setsda(struct i2c_driver_t *st, UINT32 state)
 {
 	UCHAR *mmio = st->mmio_start_virtual;
 	UINT32 val;
@@ -34,7 +34,7 @@ static VOID i810_setsda(struct i2c_struct *st, UINT32 state)
 	val = INREG(mmio + st->ddc_base);
 }
 
-static VOID i810_setscl(struct i2c_struct *st, UINT32 state)
+static VOID i810_setscl(struct i2c_driver_t *st, UINT32 state)
 {
 	UCHAR *mmio = st->mmio_start_virtual;
 	UINT32 val;
@@ -44,7 +44,7 @@ static VOID i810_setscl(struct i2c_struct *st, UINT32 state)
 	val = INREG(mmio + st->ddc_base);
 }
 
-static UINT32 i810_getsda(struct i2c_struct *st)
+static UINT32 i810_getsda(struct i2c_driver_t *st)
 {
 	UCHAR *mmio = st->mmio_start_virtual;
 	UINT32 val;
@@ -55,7 +55,7 @@ static UINT32 i810_getsda(struct i2c_struct *st)
 	return ((val & SDA_VAL_IN) != 0);
 }
 
-static UINT32 i810_getscl(struct i2c_struct *st)
+static UINT32 i810_getscl(struct i2c_driver_t *st)
 {
 	UCHAR *mmio = st->mmio_start_virtual;
 	UINT32 val;
@@ -66,7 +66,7 @@ static UINT32 i810_getscl(struct i2c_struct *st)
 	return ((val & SCL_VAL_IN) != 0);
 }
 
-static VOID i810_init(struct i2c_struct *st)
+static VOID i810_init(struct i2c_driver_t *st)
 {
 	st->ddc_base = GPIOA;
 

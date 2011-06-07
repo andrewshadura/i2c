@@ -8,7 +8,7 @@
 #define LOW               0
 #define HIGH              1
 
-struct i2c_struct
+struct i2c_driver_t
 {
 	UINT32 ddc_base;
 	UCHAR *mmio_start_virtual;
