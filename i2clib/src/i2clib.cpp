@@ -8,6 +8,10 @@
 #include "i810_i2c.cpp"
 #include "radeon_i2c.cpp"
 
+#ifndef UINT8
+#define UINT8 UCHAR
+#endif
+
 #ifdef __cplusplus    // If used by C++ code, 
 extern "C" {          // we need to export the C interface
 #endif
