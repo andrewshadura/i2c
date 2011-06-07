@@ -1,0 +1,13 @@
+EXPORTS
+LoadPhyMemDriver
+MapPhyMem
+ReadPCI
+ReadPortByte
+ReadPortLong
+ReadPortWord
+UnloadPhyMemDriver
+UnmapPhyMem
+WritePCI
+WritePortByte
+WritePortLong
+WritePortWord
