@@ -3,16 +3,20 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include "..\external\pmdll.h"
+#include "../external/pmdll.h"
 #include "i2c_base.cpp"
 #include "i810_i2c.cpp"
 #include "radeon_i2c.cpp"
+
+#ifndef UINT8
+#define UINT8 UCHAR
+#endif
 
 #ifdef __cplusplus    // If used by C++ code, 
 extern "C" {          // we need to export the C interface
 #endif
 
-	struct i2c_struct *I2C_STRUCT = NULL;
+	struct i2c_driver_t *I2C_STRUCT = NULL;
 	DWORD MMIO_PHYS_ADDRESS;
 	DWORD MMIO_SIZE;
 
@@ -31,7 +35,7 @@ extern "C" {          // we need to export the C interface
 			return FALSE;
 		}
 
-		I2C_STRUCT = (struct i2c_struct *)calloc(1, sizeof(struct i2c_struct));
+		I2C_STRUCT = (struct i2c_driver_t *)calloc(1, sizeof(struct i2c_driver_t));
 
 		I2C_STRUCT->mmio_start_virtual = (UINT8 *)MapPhyMem(MMIO_PHYS_ADDRESS, MMIO_SIZE);
 		printf("\nmapped virtual address = 0x%08x", I2C_STRUCT->mmio_start_virtual);

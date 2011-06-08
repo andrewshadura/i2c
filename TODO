@@ -1,7 +1,14 @@
-All done
+Todo:
+* don't include the source files, link them instead; that requires dropping
+  'static' keyword from some symbols, however
+* don't do i/o mapping unconditionally in the Open(), consult the driver first
+* add probe function to the driver
+* the code's C, not C++, so why do you check for C++ and name the sources .cpp?
+* it's better to use standard <stdint.h> integer types like uint8_t
+* fix the Sleep() issue
 
 Wishlist items:
-* try to build with MinGW (and write a simple Makefile)
++ try to build with MinGW (and write a simple Makefile)
 * write code Doxygen-style comments and process with Doxygen to make docs
 * add support for more chips
 * ...
